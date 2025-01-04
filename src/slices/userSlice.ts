@@ -12,8 +12,8 @@ export const userSlice = createSlice({
 	initialState,
 	reducers: {
 		setUserType: (state, action) => {
-			setItemInLs('userRole', action.payload);
-			state.userRole = action.payload;
+			setItemInLs('userRole', action.payload.role);
+			state.userRole = action.payload.role;
 		},
 		getUserType: (state) => {
 			const userRole = getItemFromLs('userRole');
@@ -23,7 +23,6 @@ export const userSlice = createSlice({
 	},
 });
 
-// Action creators are generated for each case reducer function
-export const { setUserType } = userSlice.actions;
+export const { setUserType, getUserType } = userSlice.actions;
 
 export default userSlice.reducer;
