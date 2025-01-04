@@ -1,5 +1,3 @@
-import React from 'react'
-
 const InventoryTable = () => {
   return (
     <div>InventoryTable</div>
