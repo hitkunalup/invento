@@ -28,7 +28,7 @@ const Inventory = () => {
 	return (
 		<>
 			<Header />
-			<main className="mt-6 flex flex-col gap-6 px-4 w-full">
+			<main className="mt-6 flex flex-col gap-6 px-4 w-full pb-5">
 				<h1>Inventory Stats</h1>
 				<section className="flex gap-4">
 					{cardsData.map((card) => (
