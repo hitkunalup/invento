@@ -3,7 +3,7 @@ import Card from './Card';
 import './index.scss';
 import { useStateValues } from './custom-hooks/useStateValues';
 import ErrorAlert from '../commons/ErrorAlert';
-import CustomTable from '../commons/CustomTable';
+import CustomTable, { Columns } from '../commons/CustomTable';
 import { useColumns } from './custom-hooks/useColumns';
 import EditAlert from './EditAlert';
 
@@ -41,7 +41,7 @@ const Inventory = () => {
 						/>
 					))}
 				</section>
-				<CustomTable loading={loading} data={data} columns={columns} />
+				<CustomTable loading={loading} data={data as { [key: string]: unknown; id?: string | number }[]} columns={columns as unknown as Columns} />
 			</main>
 			{showAlert ? (
 				<ErrorAlert message="Failed to fetch inventory data" />

@@ -1,16 +1,21 @@
 import TableLoader from './TableLoader';
 
+export type Columns = Array<{
+	title: string;
+	render: (
+		data: unknown,
+		index: number
+	) => JSX.Element | string | number | null;
+}>;
+
 const CustomTable = ({
 	loading,
 	data,
 	columns,
 }: {
 	loading: boolean;
-	data: Array<{ id: string | number; [key: string]: unknown }>;
-	columns: Array<{
-		title: string;
-		render: (data: unknown, index: number) => JSX.Element;
-	}>;
+	data: Array<{ id?: string | number; [key: string]: unknown }>;
+	columns: Columns;
 }) => {
 	return loading ? (
 		<TableLoader />
