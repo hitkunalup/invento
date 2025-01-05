@@ -1,24 +1,58 @@
 import Header from './Header';
 import Card from './Card';
 import './index.scss';
-import InventoryTable from './InventoryTable';
 import { useStateValues } from './custom-hooks/useStateValues';
+import ErrorAlert from '../commons/ErrorAlert';
+import CustomTable from '../commons/CustomTable';
+import { useColumns } from './custom-hooks/useColumns';
+import EditAlert from './EditAlert';
 
 const Inventory = () => {
-	const { loading, data } = useStateValues();
+	const {
+		loading,
+		data,
+		editModal,
+		cardsData,
+		showAlert,
+		onDeleteEntry,
+		onDisableEntry,
+		onOpenModal,
+		onEditEntry,
+		onCloseModal,
+	} = useStateValues();
+	const columns = useColumns({
+		onEdit: onOpenModal,
+		onDeleteEntry,
+		onDisableEntry,
+	});
 	return (
 		<>
 			<Header />
 			<main className="mt-6 flex flex-col gap-6 px-4 w-full">
 				<h1>Inventory Stats</h1>
 				<section className="flex gap-4">
-					<Card label="Total product" value={30} icon={<></>} />
-					<Card label="Total store value" value={30} icon={<></>} />
-					<Card label="Out of stocks" value={30} icon={<></>} />
-					<Card label="No of Category" value={30} icon={<></>} />
+					{cardsData.map((card) => (
+						<Card
+							key={card.id}
+							label={card.label}
+							value={card.value}
+							icon={<card.icon />}
+							loading={loading}
+						/>
+					))}
 				</section>
-				<InventoryTable loading={loading} data={data} />
+				<CustomTable loading={loading} data={data} columns={columns} />
 			</main>
+			{showAlert ? (
+				<ErrorAlert message="Failed to fetch inventory data" />
+			) : null}
+			{editModal ? (
+				<EditAlert
+					defaultData={editModal}
+					onCloseModal={onCloseModal}
+					onSave={onEditEntry}
+				/>
+			) : null}
 		</>
 	);
 };

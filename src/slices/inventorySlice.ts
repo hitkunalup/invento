@@ -1,35 +1,54 @@
-import { createSlice } from '@reduxjs/toolkit'
-import type { PayloadAction } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { Inventory } from './interface';
 
-export interface CounterState {
-  value: number
-}
-
-const initialState: CounterState = {
-  value: 0,
-}
+const initialState: Inventory = {
+	data: [],
+	loading: true,
+};
 
 export const inventorySlice = createSlice({
-  name: 'inventory',
-  initialState,
-  reducers: {
-    increment: (state) => {
-      // Redux Toolkit allows us to write "mutating" logic in reducers. It
-      // doesn't actually mutate the state because it uses the Immer library,
-      // which detects changes to a "draft state" and produces a brand new
-      // immutable state based off those changes
-      state.value += 1
-    },
-    decrement: (state) => {
-      state.value -= 1
-    },
-    incrementByAmount: (state, action: PayloadAction<number>) => {
-      state.value += action.payload
-    },
-  },
-})
+	name: 'inventory',
+	initialState,
+	reducers: {
+		setData: (state, action) => {
+			state.loading = false;
+			state.data = action.payload.data;
+		},
+		setLoading: (state, action: PayloadAction<boolean>) => {
+			state.loading = action.payload;
+		},
+		setDataAfterEdit: (state, action) => {
+			state.data = state.data.map((item, index) => {
+				if (index === action.payload.index) {
+					return action.payload.data;
+				}
+				return item;
+			});
+		},
+		setDataAfterDelete: (state, action) => {
+			state.data = state.data.filter(
+				(_, index) => index !== action.payload.index
+			);
+		},
+		disableRow: (state, action) => {
+			state.data = state.data.map((item, index) => {
+				if (index === action.payload.index) {
+					return { ...item, is_disabled: !item.is_disabled };
+				}
+				return item;
+			});
+		},
+	},
+});
 
 // Action creators are generated for each case reducer function
-export const { increment, decrement, incrementByAmount } = inventorySlice.actions
+export const {
+	setData,
+	setLoading,
+	setDataAfterDelete,
+	setDataAfterEdit,
+	disableRow,
+} = inventorySlice.actions;
 
-export default inventorySlice.reducer
+export default inventorySlice.reducer;
