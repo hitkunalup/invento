@@ -15,7 +15,7 @@ export const userSlice = createSlice({
 			setItemInLs('userRole', action.payload.role);
 			state.userRole = action.payload.role;
 		},
-		getUserType: (state) => {
+		getAndSetUserType: (state) => {
 			const userRole = getItemFromLs('userRole');
 
 			state.userRole = userRole || ADMIN;
@@ -23,6 +23,6 @@ export const userSlice = createSlice({
 	},
 });
 
-export const { setUserType, getUserType } = userSlice.actions;
+export const { setUserType, getAndSetUserType } = userSlice.actions;
 
 export default userSlice.reducer;

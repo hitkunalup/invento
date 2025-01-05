@@ -15,6 +15,7 @@ const Header = () => {
 			})
 		);
 	}, []);
+
 	return (
 		<header className="w-full bg-neutral-800 py-2 px-4 flex justify-end">
 			<label className="inline-flex items-center cursor-pointer gap-3">

@@ -16,6 +16,8 @@ import {
 	setLoading,
 } from '../../slices/inventorySlice';
 import { InventoryItem } from '../interface';
+import { getAndSetUserType } from '../../slices/userSlice';
+import { formatPrice } from '../../utils';
 
 export const useStateValues = () => {
 	const dispatch = useDispatch();
@@ -39,9 +41,11 @@ export const useStateValues = () => {
 				id: 2,
 				label: 'Total store value',
 				value: data?.length
-					? data.reduce(
-							(acc, curr) => acc + Number(curr.value.replace('$', '')),
-							0
+					? formatPrice(
+							data.reduce(
+								(acc, curr) => acc + Number(curr.value.replace('$', '')),
+								0
+							)
 					  )
 					: '-',
 				icon: DollarOutlined,
@@ -49,7 +53,9 @@ export const useStateValues = () => {
 			{
 				id: 3,
 				label: 'Out of stocks',
-				value: data?.length ? data?.filter((d) => !d.quantity)?.length : '-',
+				value: data?.length
+					? data?.filter((d) => !Number(d.quantity))?.length
+					: '-',
 				icon: MinusCircleOutlined,
 			},
 			{
@@ -95,11 +101,13 @@ export const useStateValues = () => {
 			index,
 		});
 	};
+
 	const onCloseModal = () => {
 		setEditModal(null);
 	};
 
 	useEffect(() => {
+		dispatch(getAndSetUserType());
 		fetchInventoryData()
 			.then((response) => {
 				dispatch(setData({ data: response }));

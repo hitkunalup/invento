@@ -1,3 +1,17 @@
+
+.svg-sm {
+	& svg {
+		width: 16px;
+		height: 16px;
+	}
+}
+.svg-md {
+	& svg {
+		width: 24px;
+		height: 24px;
+	}
+}
+
 .svg-lg {
 	& svg {
 		width: 32px;

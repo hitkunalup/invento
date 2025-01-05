@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { InventoryItem } from './interface';
+import { CloseOutlined } from '@ant-design/icons';
+import { checkDefinedValue, hasEmptyKey } from '../utils';
 
 const EditAlert = ({
 	defaultData,
@@ -12,75 +14,76 @@ const EditAlert = ({
 }) => {
 	const [data, setData] = useState<InventoryItem>(defaultData);
 
-	const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {};
+	const onChange = (key: string, value: string | number) => {
+		setData((prev) => ({
+			...prev,
+			[key]: value,
+			...(key === 'price'
+				? {
+						value: (Number(value) * prev.quantity).toString(),
+				  }
+				: key === 'quantity'
+				? {
+						value: (Number(value) * Number(prev.price)).toString(),
+				  }
+				: {}),
+		}));
+	};
 
+	const onSaveClick = () => {
+		const dataToSave = { ...data };
+		if (hasEmptyKey(dataToSave)) {
+			alert('Please fill all the fields');
+			return;
+		}
+
+		onSave(dataToSave);
+	};
 	return (
 		<>
 			<div
 				id="crud-modal"
 				tabIndex={-1}
-				aria-hidden="true"
-				className="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full"
+				className="overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full flex"
+				aria-modal="true"
+				role="dialog"
 			>
-				<div className="relative p-4 w-full max-w-md max-h-full">
+				<div className="relative p-3 z-10 w-full max-w-2xl min-h-56 max-h-96">
 					<div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-						<div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
-							<h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-								Create New Product
-							</h3>
+						<div className="flex items-start justify-between p-3 md:p-4 rounded-t">
+							<div className="flex flex-col gap-2">
+								<h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
+									Edit product
+								</h2>
+								<p className="text-lg font-normal text-gray-900 dark:text-white">
+									{data.name}
+								</p>
+							</div>
 							<button
 								type="button"
-								className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
-								data-modal-toggle="crud-modal"
+								onClick={onCloseModal}
+								className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-3 py-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700"
 							>
-								<svg
-									className="w-3 h-3"
-									aria-hidden="true"
-									xmlns="http://www.w3.org/2000/svg"
-									fill="none"
-									viewBox="0 0 14 14"
-								>
-									<path
-										stroke="currentColor"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-										stroke-width="2"
-										d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-									/>
-								</svg>
-								<span className="sr-only">Close modal</span>
+								<CloseOutlined />
 							</button>
 						</div>
-						<form className="p-4 md:p-5">
-							<div className="grid gap-4 mb-4 grid-cols-2">
-								<div className="col-span-2">
-									<label
-										htmlFor="name"
-										className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-									>
-										Name
-									</label>
-									<input
-										type="text"
-										name="name"
-										id="name"
-										className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-										placeholder="Type product name"
-									/>
-								</div>
+						<form className="px-4 pb-5">
+							<div className="grid gap-6 mb-6 grid-cols-2">
 								<div className="col-span-2 sm:col-span-1">
 									<label
 										htmlFor="price"
 										className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 									>
-										Price
+										Category
 									</label>
 									<input
-										type="number"
-										name="price"
-										id="price"
+										name="category"
+										id="category"
+										value={data.category}
 										className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-										placeholder="$2999"
+										placeholder="Enter..."
+										required
+										onChange={(e) => onChange('category', e.target.value)}
 									/>
 								</div>
 								<div className="col-span-2 sm:col-span-1">
@@ -88,54 +91,101 @@ const EditAlert = ({
 										htmlFor="category"
 										className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 									>
-										Category
+										Price
 									</label>
-									<select
-										id="category"
-										className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-									>
-										<option>Select category</option>
-										<option value="TV">TV/Monitors</option>
-										<option value="PC">PC</option>
-										<option value="GA">Gaming/Console</option>
-										<option value="PH">Phones</option>
-									</select>
+									<input
+										type="number"
+										name="price"
+										value={data?.price?.replace('$', '')}
+										id="price"
+										className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+										placeholder="Enter..."
+										required
+										min={0}
+										onChange={(e) => {
+											let value = e.target.value;
+											if (checkDefinedValue(value) && Number(value) < 0) {
+												value = `0`;
+											}
+
+											onChange('price', value);
+										}}
+									/>
 								</div>
-								<div className="col-span-2">
+								<div className="col-span-2 sm:col-span-1">
 									<label
-										htmlFor="description"
+										htmlFor="quantity"
 										className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
 									>
-										Product Description
+										Quantity
 									</label>
-									<textarea
-										id="description"
-										rows={4}
-										className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-										placeholder="Write product description here"
-									></textarea>
+									<input
+										type="number"
+										name="quantity"
+										value={data.quantity}
+										id="quantity"
+										min={0}
+										className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+										placeholder="Enter..."
+										required
+										onChange={(e) => {
+											let value = e.target.value;
+											if (checkDefinedValue(value) && Number(value) < 0) {
+												value = `0`;
+											}
+
+											onChange('quantity', value);
+										}}
+									/>
+								</div>
+								<div className="col-span-2 sm:col-span-1">
+									<label
+										htmlFor="value"
+										className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+									>
+										Value
+									</label>
+									<input
+										type="number"
+										name="value"
+										value={data?.value?.replace('$', '')}
+										id="value"
+										className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+										placeholder="Enter..."
+										required
+										min={0}
+										onChange={(e) => onChange('value', e.target.value)}
+									/>
 								</div>
 							</div>
-							<button
-								type="submit"
-								className="text-white inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-							>
-								<svg
-									className="me-1 -ms-1 w-5 h-5"
-									fill="currentColor"
-									viewBox="0 0 20 20"
-									xmlns="http://www.w3.org/2000/svg"
+							<div className="w-full flex justify-end gap-1">
+								<button
+									type="button"
+									onClick={onCloseModal}
+									className="py-2.5 px-5 me-2 mb-2 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-full border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700"
 								>
-									<path
-										fill-rule="evenodd"
-										d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z"
-										clip-rule="evenodd"
-									></path>
-								</svg>
-								Add new product
-							</button>
+									Cancel
+								</button>
+								<button
+									type="button"
+									onClick={onSaveClick}
+									className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+								>
+									Save
+								</button>
+							</div>
 						</form>
 					</div>
+				</div>
+				<div>
+					<div
+						className="fixed inset-0 z-1 bg-black bg-opacity-50"
+						data-modal-toggle="crud-modal"
+						onClick={(e) => {
+							e.stopPropagation();
+							onCloseModal();
+						}}
+					></div>
 				</div>
 			</div>
 		</>
